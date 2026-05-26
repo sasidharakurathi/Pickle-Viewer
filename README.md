@@ -74,42 +74,6 @@ npm run watch
 6. In this host window, open any workspace containing `.pkl` files (or generate sample pickles by running `python scratch/create_test_pickles.py` in your terminal!).
 7. Double-click any `.pkl` file in the Explorer to launch it immediately inside our custom Pickle Viewer default visualizer editor!
 
----
-
-## 📦 VSIX Packaging & VS Code Marketplace Publishing
-
-To compile the extension into a shareable `.vsix` installer package and publish it to the official Microsoft Visual Studio Marketplace, follow these steps:
-
-### Prerequisites for Publishing
-*   A **Microsoft Account** linked to a [Microsoft Azure DevOps organization](https://aex.dev.azure.com/).
-*   A **Personal Access Token (PAT)** created inside your Azure DevOps account under "All accessible organizations", authorized with "Marketplace: Publish" scopes.
-*   A **Publisher ID** created in the [VS Code Marketplace Publisher Management Portal](https://marketplace.visualstudio.com/manage).
-
-### 1. Packaging VSIX locally
-To package the extension into a local VSIX installer file:
-1. Install the VS Code Extension CLI globally:
-   ```bash
-   npm install -g @vscode/vsce
-   ```
-2. Run the packaging command from the project root:
-   ```bash
-   vsce package
-   ```
-3. A file named `pkl-viewer-1.0.0.vsix` will be generated in your project root!
-4. Install it locally by opening the Command Palette (`Ctrl+Shift+P`), typing `Extensions: Install from VSIX...`, and selecting your generated file.
-
-### 2. VS Code Marketplace publishing commands
-To publish your VSIX directly to the Visual Studio Code Marketplace using command lines:
-```bash
-# Log in to your publisher account (input your DevOps PAT when prompted)
-vsce login <YOUR_PUBLISHER_ID>
-
-# Publish the extension
-vsce publish
-```
-
----
-
 ## 🛡️ Security Warnings & Trust
 
 Because pickles can execute arbitrary code upon unpickling, **never load `.pkl` files from untrusted sources**. 
