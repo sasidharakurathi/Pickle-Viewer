@@ -1,0 +1,98 @@
+{
+  "name": "pickle-visual-viewer",
+  "displayName": "Pickle Viewer",
+  "description": "Safely open, inspect, and analyze Python pickle (.pkl) files visually inside VS Code with dynamic tree, DataFrame, hex, and security views.",
+  "version": "1.0.0",
+  "publisher": "SasidharAkurathi",
+  "icon": "media/logo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/pickle-viewer.git"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Visualization",
+    "Data Science",
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "pklViewer.pklEditor",
+        "displayName": "Pickle Viewer",
+        "selector": [
+          {
+            "filenamePattern": "*.pkl"
+          },
+          {
+            "filenamePattern": "*.pickle"
+          },
+          {
+            "filenamePattern": "*.pck"
+          },
+          {
+            "filenamePattern": "*.pckl"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "commands": [
+      {
+        "command": "pklViewer.openFile",
+        "title": "Open Pickle File...",
+        "category": "Pickle Viewer"
+      },
+      {
+        "command": "pklViewer.openInViewer",
+        "title": "Open with Pickle Viewer",
+        "category": "Pickle Viewer"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "pklViewer.openInViewer",
+          "when": "resourceExtname == .pkl || resourceExtname == .pickle || resourceExtname == .pck || resourceExtname == .pckl",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Pickle Viewer",
+      "properties": {
+        "pklViewer.pythonPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the Python executable. If left empty, the extension will attempt to use the active workspace Python interpreter from the official VS Code Python extension, or fallback to the system python."
+        },
+        "pklViewer.maxListLength": {
+          "type": "integer",
+          "default": 100,
+          "description": "Maximum number of items in a list or tuple to serialize and display at once. Larger arrays are truncated to preserve performance."
+        },
+        "pklViewer.maxDfRows": {
+          "type": "integer",
+          "default": 100,
+          "description": "Initial number of rows to retrieve from a Pandas DataFrame."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.34",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^4.9.5"
+  }
+}

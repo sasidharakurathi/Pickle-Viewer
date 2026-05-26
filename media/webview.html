@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource} data:; media-src ${cspSource} data:; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource} 'unsafe-inline';">
+    <link href="${styleUri}" rel="stylesheet">
+    <title>Pickle Viewer</title>
+</head>
+<body class="loading-state">
+
+    <!-- Header Panel -->
+    <header class="app-header">
+        <div class="header-main">
+            <span class="file-icon">📦</span>
+            <h2 id="file-title">Loading File...</h2>
+        </div>
+        <div class="header-actions">
+            <button id="btn-export-json" class="btn secondary" title="Export parsed content as JSON">
+                <span class="btn-icon">💾</span> Export JSON
+            </button>
+            <button id="btn-export-schema" class="btn secondary" title="Export object structural schema">
+                <span class="btn-icon">📋</span> Export Schema
+            </button>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="app-tabs">
+        <button class="tab-btn active" data-tab="tab-explorer">
+            <span class="tab-icon">🌳</span> Explorer
+        </button>
+        <button class="tab-btn" data-tab="tab-dataframe" id="tab-btn-dataframe">
+            <span class="tab-icon">📊</span> DataFrame Viewer
+        </button>
+        <button class="tab-btn" data-tab="tab-hex" id="tab-btn-hex">
+            <span class="tab-icon">🔢</span> Hex Inspector
+        </button>
+        <button class="tab-btn" data-tab="tab-security" id="tab-btn-security">
+            <span class="tab-icon">🛡️</span> Security Audit
+        </button>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="app-workspace">
+        
+        <!-- TAB 1: TREE EXPLORER -->
+        <section id="tab-explorer" class="tab-content active">
+            <div class="filter-bar">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="tree-search" placeholder="Search keys or values..." autocomplete="off">
+                    <span id="search-matches" class="search-matches hide">0 matches</span>
+                    <button id="btn-clear-search" class="btn-clear hide" title="Clear Search">✕</button>
+                </div>
+                <div class="tree-controls">
+                    <button id="btn-expand-all" class="btn-text">Expand All</button>
+                    <button id="btn-collapse-all" class="btn-text">Collapse All</button>
+                </div>
+            </div>
+            <div id="tree-container" class="tree-container monospace">
+                <!-- Recursive JSON tree will be injected here -->
+            </div>
+        </section>
+
+        <!-- TAB 2: DATAFRAME VIEWER -->
+        <section id="tab-dataframe" class="tab-content">
+            <div class="dataframe-header">
+                <div class="selector-wrapper">
+                    <label for="df-selector">Active DataFrame:</label>
+                    <select id="df-selector">
+                        <option value="">-- Click a DataFrame in the Tree --</option>
+                    </select>
+                </div>
+                <div id="df-meta-summary" class="df-meta-summary monospace">
+                    Shape: -
+                </div>
+            </div>
+            <div class="dataframe-workspace">
+                <div class="dataframe-grid-container">
+                    <table id="df-table" class="df-table monospace">
+                        <!-- Table will be injected here -->
+                        <thead>
+                            <tr><th>No active DataFrame selected. Select one from the dropdown or click it in the Explorer.</th></tr>
+                        </thead>
+                    </table>
+                </div>
+                <aside class="dataframe-sidebar">
+                    <h3>📊 Column Statistics</h3>
+                    <div id="df-stats-container" class="df-stats-container">
+                        <div class="no-stats-placeholder">Select a numerical column or DataFrame to view metrics.</div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- TAB 3: HEX INSPECTOR -->
+        <section id="tab-hex" class="tab-content">
+            <div class="hex-controls">
+                <div class="hex-pagination">
+                    <button id="btn-hex-prev" class="btn secondary small">◀ Prev</button>
+                    <span id="hex-page-info" class="monospace">Page 1 / 1</span>
+                    <button id="btn-hex-next" class="btn secondary small">Next ▶</button>
+                </div>
+                <div class="hex-options">
+                    <label for="hex-page-size">Bytes per page:</label>
+                    <select id="hex-page-size">
+                        <option value="512">512 B</option>
+                        <option value="1024" selected>1 KB</option>
+                        <option value="4096">4 KB</option>
+                        <option value="16384">16 KB</option>
+                    </select>
+                </div>
+            </div>
+            <div class="hex-viewport-wrapper">
+                <pre id="hex-viewport" class="hex-viewport monospace">Loading binary bytes...</pre>
+            </div>
+        </section>
+
+        <!-- TAB 4: SECURITY AUDIT -->
+        <section id="tab-security" class="tab-content">
+            <div class="security-layout">
+                <div class="security-summary-card">
+                    <div class="security-badge-wrapper">
+                        <span id="safety-badge" class="safety-badge low-risk">LOW RISK</span>
+                    </div>
+                    <h3 id="security-summary-title">Static Audit Report</h3>
+                    <p id="security-summary-desc">This file has been statically audited at byte level and is deemed secure.</p>
+                </div>
+                
+                <div class="security-details-grid">
+                    <div class="detail-card">
+                        <h4> Bytecode Instructions</h4>
+                        <div class="detail-status" id="status-execution-opcodes">
+                            <span class="status-dot green"></span> Safe
+                        </div>
+                        <p class="detail-desc">
+                            Checks if the file contains executable opcodes like <code class="monospace">REDUCE</code>, 
+                            <code class="monospace">BUILD</code>, or <code class="monospace">NEWOBJ</code>. Execution-free pickles are guaranteed safe.
+                        </p>
+                    </div>
+
+                    <div class="detail-card">
+                        <h4> File Metadata</h4>
+                        <table class="metadata-table monospace">
+                            <tr><td>File Name:</td><td id="meta-filename">-</td></tr>
+                            <tr><td>File Size:</td><td id="meta-filesize">-</td></tr>
+                            <tr><td>Scan Status:</td><td id="meta-scan-status">Success</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="detail-card full-width">
+                    <h4>📦 Imported Python Modules & Globals</h4>
+                    <p class="detail-desc">
+                        These are the packages and specific functions/classes this pickle triggers imports for when unpickling. 
+                        <strong>Verify that you trust these imports.</strong>
+                    </p>
+                    <ul id="security-imports-list" class="monospace imports-list">
+                        <!-- Imports list will be injected here -->
+                        <li class="empty-list">No imports detected.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Overlays for loading / trust / errors -->
+    <div id="status-overlay" class="status-overlay">
+        <div class="overlay-card">
+            <div class="overlay-visual">
+                <div class="spinner" id="overlay-spinner"></div>
+                <div id="overlay-icon" class="overlay-icon hide"></div>
+            </div>
+            <h3 id="overlay-title">Scanning file...</h3>
+            <p id="overlay-msg">Running a byte-level static check to inspect file safety.</p>
+            <div id="overlay-actions" class="overlay-actions hide">
+                <button id="btn-overlay-trust" class="btn primary">Trust and Inspect File</button>
+            </div>
+            <div id="overlay-error-details" class="overlay-error-details hide">
+                <h4>Traceback:</h4>
+                <pre id="overlay-traceback" class="monospace"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script loading -->
+    <script src="${hexScriptUri}"></script>
+    <script src="${scriptUri}"></script>
+</body>
+</html>
